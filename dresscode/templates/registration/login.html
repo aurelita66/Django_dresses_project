@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Sign in to Dresses Paradise platform!</h1>
+<form action="{% url 'login' %}" method="post">
+    {% csrf_token %}
+    <table>
+        <tr>
+            <td>Username</td>
+            <td>{{ form.username }}</td>
+        </tr>
+        <tr>
+            <td>Password</td>
+            <td>{{ form.password }}</td>
+        </tr>
+    </table>
+    <input type="submit" value="Sign in">
+    <input type="hidden" name="next" value="{{ next }}"/>
+</form>
+<p><a href="{% url 'password_reset' %}">Forgot password?</a></p>
+<p>If you do not have a membership <a href="{% url 'register' %}">Sign up</a></p>
+{% endblock %}

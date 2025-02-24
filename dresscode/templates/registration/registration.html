@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container register">
+    <h3>Registration form</h3><br/>
+    <h5 style="color: red;">Our membership fee is 8000EU per month. You must enter your bank card details
+        and we will take money automatically from your bank card. Then, You will get full
+        access to our website and all our dresses for rent! You can rent as many dresses as you want, only one exception
+        is: if you damage/destroy it - you must pay full amount of the dress.
+        Cleaning expenses is fully covered by us!
+    </h5><br/>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="first_name">First Name</label>
+            <input name="first_name" type="text" class="form-control"
+                   id="first_name" aria-describedby="firstNameHelp">
+            <small id="firstNameHelp" class="form-text text-muted"></small>
+        </div>
+        <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <input name="last_name" type="text" class="form-control"
+                   id="last_name" aria-describedby="lastNameHelp">
+            <small id="lastNameHelp" class="form-text text-muted"></small>
+        </div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input name="username" type="text" class="form-control"
+                   id="username" aria-describedby="usernameHelp">
+            <small id="usernameHelp" class="form-text text-muted"></small>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Email</label>
+            <input name="email" type="email" class="form-control"
+                   id="exampleInputEmail1" aria-describedby="emailHelp">
+            <small id="emailHelp" class="form-text text-muted"></small>
+        </div>
+        <div class="form-group">
+            <label for="iban">IBAN</label>
+            <input name="iban" type="text" class="form-control"
+                   id="iban" aria-describedby="ibanHelp">
+            <small id="ibanHelp" class="form-text text-muted">Enter your bank card IBAN number</small>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input name="password" type="password" class="form-control"
+                   id="password" aria-describedby="pwdHelp">
+            <small id="pwdHelp" class="form-text text-muted">Minimum 8 symbols</small>
+        </div>
+        <div class="form-group">
+            <label for="password2">Repeat password</label>
+            <input name="password2" type="password" class="form-control"
+                   id="password2" aria-describedby="pwd2Help">
+        </div>
+        <button type="submit" class="btn btn-primary register-button">Sign up</button>
+    </form>
+    <h5>If you already have a membership <a
+            href="{% url 'login' %}"><strong>Sign in</strong></a></h5>
+</div>
+{% endblock %}

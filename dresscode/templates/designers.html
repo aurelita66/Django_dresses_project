@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Designers</h1>
+<p>We have these famous designer's dresses on our platform:</p>
+<ul>
+    <div class="row">
+    {% for designer in designers %}
+        <div class="col-sm-6 col-md-3 d-flex align-items-stretch">
+            <div class="card mb-4 shadow">
+                {% if designer.designers_pics %}
+                    <img class="card-img-top" src="{{ designer.designers_pics.url }}"/>
+                {% endif %}
+                <div class="card-body">
+                    <p class="card-text"><a href="{% url 'designer-one' designer.id %}">{{ designer.name }}
+                        {{ designer.surname }}</a></p>
+                </div>
+           </div>
+        </div>
+    {% endfor %}
+</div>
+</ul>
+{% if designers.has_other_pages %}
+    <ul class="pagination pagination-sm">
+        {% for nr in designers.paginator.page_range %}
+            {% if designers.number == nr %}
+                <li class="page-item active">
+                    <a class="page-link">{{ nr }}</a>
+                </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ nr }}">{{ nr }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}

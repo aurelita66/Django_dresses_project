@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+    <p>Author: {{ dressreview.reviewer }}</p>
+    <p>Content: {{ dressreview.content }}</p>
+    <p>Date: {{ dressreview.date_created }}</p>
+    <div class="form-group">
+        <button class="btn btn-danger" type="submit">DELETE</button>
+        <a class="btn btn-secondary" href="{% url 'dress-one' dressreview.dress.id %}">CANCEL</a>
+    </div>
+</form>
+
+{% endblock %}

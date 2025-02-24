@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Designer</h1>
+<h4>{{ one_designer.name }} {{ one_designer.surname }}</h4>
+<hr/>
+{% if one_designer.designers_pics %}
+    <img src="{{ one_designer.designers_pics.url }}" alt="{{ one_designer.name }} {{ one_designer.surname }}
+    Photo" style="max-width: 300px; height: auto;">
+{% endif %}
+<p>{{ one_designer.description | safe }}</p>
+<hr/>
+<h5>This designer's dresses on our platform:</h5>
+{% if one_designer.dress_set.first %}
+    <ul>
+        {% for dress in one_designer.dress_set.all %}
+            <li>
+                <a href="{% url 'dress-one' dress.id %}">
+                {{ dress.item_code }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>This designer does not have dresses yet!</p>
+{% endif %}
+{% endblock %}
+
+{% block title %}<title>{{ one_designer.name }} {{ one_designer.surname }}</title>{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="margin-top: 150px;">
+<h1>Welcome to Dresses Rental Platform!</h1>
+<h1>Rent your dream dress today!</h1>
+</div>
+
+<div style="margin-top: 120px;">
+    <h2>Number of designers: {{ num_designers }}</h2>
+    <h2>Number of dresses: {{ num_dresses }}</h2>
+    <h2>Number of dresses rental records: {{ num_dress_rentals }}</h2>
+    <h2>Number of now rented dresses: {{ num_dresses_rented }}</h2>
+</div>
+
+{% endblock %}

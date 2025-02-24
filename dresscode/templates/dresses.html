@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h1>Our dresses!</h1>
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">back</a>
+        {% endif %}
+        <span class="current">
+            {{ page_obj.number }} from {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+
+</div>
+<div class="row">
+    {% for dress in dress_list %}
+        <div class="col-sm-6 col-md-3 d-flex align-items-stretch">
+            <div class="card mb-4 shadow">
+                {% if dress.dresses_pics %}
+                    <img class="card-img-top" src="{{ dress.dresses_pics.url }}"/>
+                {% else %}
+                    <img class="card-img-top" src="{% static 'img/no-image.png' %}"/>
+                {% endif %}
+                <div class="card-body">
+                    <div>
+                        <a class="btn btn-outline-success btn-sm"
+                           href="{% url 'my-rented-new' %}?dress_id={{ dress.id }}">Rent this dress</a>
+                    </div>
+                    <p class="card-text"><a href="{% url 'dress-one' dress.id %}">{{ dress.item_code }}
+                        {{ dress.designer }}</a></p>
+                </div>
+           </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Search results</h1>
+<h4>You entered <b><i>{{ query_text }}</i></b> and we have found these results:</h4>
+{% if dress_list %}
+<ul>
+    {% for dress in dress_list %}
+        <li>
+            <a href="{% url 'dress-one' dress.id %}">
+                {{ dress.item_code }}
+            </a>
+            {{ dress.designer }}
+        </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Sorry, nothing found by your entered search text</p>
+{% endif %}
+{% endblock %}

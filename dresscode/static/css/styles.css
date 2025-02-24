@@ -1,0 +1,22 @@
+body {
+    background-color: #e0b3ff;
+}
+
+.sidebar-nav {
+    list-style: none;
+    margin-top: 10px;
+}
+
+.card {
+    min-height: 480px;
+    width: 100%;
+}
+
+.card-body{
+    height: 40%;
+}
+
+.card img{
+    height: 60%;
+    object-fit: contain;
+}

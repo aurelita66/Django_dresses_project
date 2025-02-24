@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ user }}</h1>
+<img class="rounded-circle" src="{{ user.profile.picture.url }}" width="50px" height="50px"/>
+<p>My rented dresses:</p>
+{% if dressrental_list %}
+<ul>
+    {% for dressrental in dressrental_list %}
+        <li>
+            {{ dressrental.id }}
+            <div style="display: flex; align-items: center;">
+                <img src="{{ dressrental.dress.dresses_pics.url }}" style="max-width: 100px;
+                max-height: 100px; margin-right: 10px;">
+            </div>
+            <p><a href="{% url 'dress-one' dressrental.dress.id %}">{{ dressrental.dress }}</a></p>
+            <p class="{% if dressrental.is_overdue %}text-danger">
+            {% else %}text-success">
+            {% endif %} {{ dressrental.return_date }} {{ dressrental.get_status_display }}
+            <a class="btn-secondary btn-sm" href="{% url 'my-rented-update' dressrental.id %}">Update</a>
+            </p>
+        </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>You do not have rented dresses!</p>
+{% endif %}
+{% endblock %}
