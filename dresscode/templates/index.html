@@ -12,6 +12,17 @@
     <h2>Number of dresses: {{ num_dresses }}</h2>
     <h2>Number of dresses rental records: {{ num_dress_rentals }}</h2>
     <h2>Number of now rented dresses: {{ num_dresses_rented }}</h2>
+    <h2>Number of returned dresses: {{ num_dresses_returned }}</h2>
 </div>
+<hr>
+{% for group in user.groups.all %}
+    {% if group.name == 'moderators' %}
+        <h4><b>You logged in as moderator</b></h4>
+    {% elif group.name == 'staff' %}
+        <h4><b>You logged in as staff</b></h4>
+    {% else %}
+        <h4><b>You logged in as client</b></h4>
+    {% endif %}
+{% endfor %}
 
 {% endblock %}

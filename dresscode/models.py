@@ -6,6 +6,16 @@ from tinymce.models import HTMLField
 
 
 class Designer(models.Model):
+    """ Dizainerio modelis
+
+        Laukeliai:
+            name (CharField): Dizainerio vardas.
+            surname (CharField): Dizainerio pavardė.
+            description (HTMLField): Dizainerio aprašymas (naudojant TinyMCE).
+            designers_pics (ImageField): Dizainerio nuotrauka.
+        Meta:
+            ordering: Nurodo, kad dizaineriai bus rikiuojami pagal vardą ir pavardę."""
+
     name = models.CharField('Name', max_length=50)
     surname = models.CharField('Surname', max_length=50)
     description = HTMLField('Description', blank=True, null=True)
@@ -19,6 +29,11 @@ class Designer(models.Model):
 
 
 class Size(models.Model):
+    """ Dydžio modelis
+
+        Laukeliai:
+            name (CharField): Dydžio pavadinimas."""
+
     name = models.CharField('Name', max_length=50)
 
     def __str__(self):
@@ -26,6 +41,11 @@ class Size(models.Model):
 
 
 class Style(models.Model):
+    """ Stiliaus modelis
+
+       Laukeliai:
+           name (CharField): Stiliaus pavadinimas."""
+
     name = models.CharField('Name', max_length=50)
 
     def __str__(self):
@@ -33,6 +53,25 @@ class Style(models.Model):
 
 
 class Dress(models.Model):
+    """ Suknelės modelis
+
+        Laukeliai:
+              color (CharField): Suknelės spalva.
+              item_code (CharField): Suknelės prekės kodas (unikalus).
+              description (HTMLField): Suknelės aprašymas (naudojant TinyMCE).
+              designer (ForeignKey): Dizainerio ryšys.
+              sizes (ManyToManyField): Dydžių ryšys.
+              styles (ManyToManyField): Stilių ryšys.
+              dresses_pics (ImageField): Suknelės nuotrauka.
+
+        Metodai:
+              display_sizes(): Grąžina suknelės dydžių sąrašą kaip eilutę.
+              display_styles(): Grąžina suknelės stilių sąrašą kaip eilutę.
+
+        Meta:
+              verbose_name: Vienaskaitos pavadinimas.
+              verbose_name_plural: Daugiskaitos pavadinimas."""
+
     color = models.CharField('Color', max_length=50)
     item_code = models.CharField('Item code', max_length=10, unique=True)
     description = HTMLField('Description', blank=True, null=True)
@@ -60,6 +99,19 @@ class Dress(models.Model):
 
 
 class DressRental(models.Model):
+    """ Suknelės nuomos modelis
+
+       Laukeliai:
+           start_date (DateField): Nuomos pradžios data.
+           return_date (DateField): Grąžinimo data.
+           dress (ForeignKey): Suknelės ryšys.
+           user (ForeignKey): Vartotojo ryšys.
+           size (ForeignKey): Dydžio ryšys.
+           status (CharField): Nuomos statusas.
+
+       Metodai:
+           is_overdue (property): Tikrina ar suknelės grąžinimo data yra praėjusi."""
+
     start_date = models.DateField('Start day', null=True, blank=True)
     return_date = models.DateField('Return day', null=True, blank=True)
     dress = models.ForeignKey(Dress, on_delete=models.CASCADE)
@@ -93,6 +145,14 @@ class DressRental(models.Model):
 
 
 class DressReview(models.Model):
+    """ Suknelės atsiliepimo modelis
+
+        Laukeliai:
+            date_created (DateTimeField): Atsiliepimo sukūrimo data.
+            content (TextField): Atsiliepimo turinys.
+            dress (ForeignKey): Suknelės ryšys.
+            reviewer (ForeignKey): Atsiliepimo autoriaus ryšys."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     content = models.TextField('Comment', max_length=2000)
     dress = models.ForeignKey(Dress, on_delete=models.CASCADE, blank=True)
@@ -103,6 +163,16 @@ class DressReview(models.Model):
 
 
 class Profile(models.Model):
+    """ Vartotojo profilio modelis
+
+        Laukeliai:
+            picture (ImageField): Profilio nuotrauka.
+            user (OneToOneField): Vartotojo ryšys.
+            iban (CharField): IBAN banko sąskaitos numeris.
+
+        Metodai:
+            save(): Automatiškai sumažina įkeliamas profilio nuotraukas."""
+
     picture = models.ImageField(upload_to='profile_pics', default='default-user.png')
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     iban = models.CharField('IBAN', max_length=50)

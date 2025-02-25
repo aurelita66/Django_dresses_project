@@ -14,5 +14,8 @@ urlpatterns = [
     path('mydresses/new', views.DressRentalByUserCreateView.as_view(), name='my-rented-new'),
     path('mydresses/update/<int:pk>', views.DressRentalByUserUpdateView.as_view(), name='my-rented-update'),
     path('dresses/reviews/<int:pk>', views.DressReviewDeleteView.as_view(), name='reviews-delete'),
+    path('allrents/', views.AllRentsView.as_view(), name='allrents'),
+    path('rent/delete/<int:pk>/', views.DressRentalDeleteView.as_view(), name='delete-rent'),
+    path('rent/update/<int:pk>/', views.DressRentalUpdateView.as_view(), name='update-rent'),
 
 ]

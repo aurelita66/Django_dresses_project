@@ -13,18 +13,31 @@ from .utils import check_password
 
 
 def index(request):
-    """Rodo pagrindinį puslapį su statistika, jei vartotojas prisijungęs,
-    o jei neprisijungęs nukreipia į registracijos puslapį."""
+    """
+       Rodo pagrindinį puslapį su statistika, jei vartotojas prisijungęs,
+       o jei neprisijungęs nukreipia į registracijos puslapį.
+
+       Funkcijos logika:
+           1. Tikrinama, ar vartotojas yra prisijungęs (request.user.is_authenticated).
+           2. Jei vartotojas yra prisijungęs:
+               Skaičiuojamas dizainerių, suknelių, nuomos įrašų, išnuomotų ir grąžintų suknelių skaičius.
+               Sukuriamas kontekstas su šiais duomenimis.
+               Atvaizduojamas 'index.html' šablonas su kontekstu.
+           3. Jei vartotojas nėra prisijungęs:
+               Nukreipiama į registracijos puslapį (redirect('register')).
+    """
     if request.user.is_authenticated:
         num_designers = Designer.objects.count()
         num_dresses = Dress.objects.count()
         num_dress_rentals = DressRental.objects.count()
         num_dresses_rented = DressRental.objects.filter(status__exact='rented').count()
+        num_dresses_returned = DressRental.objects.filter(status__exact='returned').count()
 
         context = {'num_designers': num_designers,
                    'num_dresses': num_dresses,
                    'num_dress_rentals': num_dress_rentals,
-                   'num_dresses_rented': num_dresses_rented
+                   'num_dresses_rented': num_dresses_rented,
+                   'num_dresses_returned': num_dresses_returned
                    }
 
         return render(request, 'index.html', context=context)
@@ -34,7 +47,17 @@ def index(request):
 
 
 def get_designers(request):
-    """Gauna visus dizainerius, suskirsto juos į puslapius ir rodo dizainerių sąrašą."""
+    """
+        Gauna visus dizainerius, suskirsto juos į puslapius ir rodo dizainerių sąrašą.
+
+        Funkcijos logika:
+            1. Gaunami visi dizaineriai iš duomenų bazės (Designer.objects.all()).
+            2. Sukuriamas puslapiavimo objektas (Paginator), kuris suskirsto dizainerius į puslapius.
+            3. Gaunamas puslapio numeris iš užklausos (request.GET.get('page')).
+            4. Gaunamas puslapis su dizaineriais pagal puslapio numerį (paginator.get_page(page_number)).
+            5. Sukuriamas kontekstas su puslapiuotu dizainerių sąrašu.
+            6. Atvaizduojamas 'designers.html' šablonas su kontekstu.
+    """
     designers = Designer.objects.all()
     paginator = Paginator(designers, 2)
     page_number = request.GET.get('page')
@@ -44,14 +67,32 @@ def get_designers(request):
 
 
 def get_one_designer(request, designer_id):
-    """Gauna vieną dizainerį pagal ID ir rodo jo informaciją."""
+    """
+        Gauna vieną dizainerį pagal ID ir rodo jo informaciją.
+
+        Funkcijos logika:
+            1. Gaunamas dizaineris iš duomenų bazės pagal ID (get_object_or_404(Designer, pk=designer_id)).
+            2. Sukuriamas kontekstas su dizainerio informacija.
+            3. Atvaizduojamas 'designer.html' šablonas su kontekstu.
+    """
     one_designer = get_object_or_404(Designer, pk=designer_id)
     context = {'one_designer': one_designer}
     return render(request, 'designer.html', context=context)
 
 
 class DressListView(generic.ListView):
-    """Rodo suknelių sąrašą, suskirstytą į puslapius."""
+    """
+       Rodo suknelių sąrašą, suskirstytą į puslapius.
+
+       Klasės kintamieji:
+           model (Model): Modelis, iš kurio gaunami objektai (Dress).
+           context_object_name (str): Konteksto kintamojo pavadinimas ('dress_list').
+           template_name (str): Šablono pavadinimas ('dresses.html').
+           paginate_by (int): Objektų skaičius viename puslapyje (4).
+
+       Metodai:
+           get_queryset(): Gauna suknelių sąrašą iš duomenų bazės.
+    """
     model = Dress
     context_object_name = 'dress_list'
     template_name = 'dresses.html'
@@ -59,7 +100,20 @@ class DressListView(generic.ListView):
 
 
 class DressDetailView(generic.edit.FormMixin, generic.DetailView):
-    """Rodo suknelės detalę informaciją ir leidžia vartotojams palikti atsiliepimą."""
+    """
+       Rodo suknelės detalę informaciją ir leidžia vartotojams palikti atsiliepimą.
+
+       Klasės kintamieji:
+           model (Model): Modelis, iš kurio gaunamas objektas (Dress).
+           context_object_name (str): Konteksto kintamojo pavadinimas ('dress').
+           template_name (str): Šablono pavadinimas ('dress.html').
+           form_class (Form): Atsiliepimo forma (DressReviewForm).
+
+       Metodai:
+           post(): Apdoroja atsiliepimo formos pateikimą.
+           form_valid(): Išsaugo atsiliepimą, susieja jį su suknele ir vartotoju.
+           get_success_url(): Nukreipia į suknelės puslapį po sėkmingo atsiliepimo palikimo.
+    """
     model = Dress
     context_object_name = 'dress'
     template_name = 'dress.html'
@@ -87,7 +141,15 @@ class DressDetailView(generic.edit.FormMixin, generic.DetailView):
 
 
 def search(request):
-    """Ieško suknelių pagal spalvą, stilių, prekės kodą ir rodo rezultatus."""
+    """
+        Ieško suknelių pagal spalvą, stilių, prekės kodą ir rodo rezultatus.
+
+        Funkcijos logika:
+            1. Gaunamas paieškos tekstas iš užklausos (request.GET.get('search_text')).
+            2. Ieškoma suknelių, kurių spalva, stilius arba prekės kodas atitinka paieškos tekstą.
+            3. Sukuriamas kontekstas su paieškos tekstu ir rezultatais.
+            4. Atvaizduojamas 'search_results.html' šablonas su kontekstu.
+    """
     query_text = request.GET.get('search_text')
     search_results = Dress.objects.filter(
         Q(color__icontains=query_text)
@@ -102,7 +164,17 @@ def search(request):
 
 
 class RentedDressesByUserListView(LoginRequiredMixin, generic.ListView):
-    """Rodo prisijungusio vartotojo išsinuomotas sukneles."""
+    """
+        Rodo prisijungusio vartotojo išsinuomotas sukneles.
+
+        Klasės kintamieji:
+            model (Model): Modelis, iš kurio gaunami objektai (DressRental).
+            context_object_name (str): Konteksto kintamojo pavadinimas ('dressrental_list').
+            template_name (str): Šablono pavadinimas ('user_dresses.html').
+
+        Metodai:
+            get_queryset(): Gauna prisijungusio vartotojo išsinuomotas sukneles.
+    """
     model = DressRental
     context_object_name = 'dressrental_list'
     template_name = 'user_dresses.html'
@@ -114,8 +186,20 @@ class RentedDressesByUserListView(LoginRequiredMixin, generic.ListView):
 
 @csrf_protect
 def register_user(request):
-    """Registruoja naują vartotoją, tikrina ar sutampa slaptažodžiai,
-    ar neegzistuoja jau toks username, el.paštas, ar iban laukelis netuščias"""
+    """
+        Registruoja naują vartotoją, tikrina ar sutampa slaptažodžiai,
+        ar neegzistuoja jau toks username, el.paštas, ar iban laukelis netuščias.
+
+        Funkcijos logika:
+            1. Jei užklausa yra GET, atvaizduojamas registracijos šablonas.
+            2. Jei užklausa yra POST:
+                Gaunami duomenys iš formos.
+                Tikrinama, ar slaptažodžiai sutampa, ar neegzistuoja jau toks vartotojo vardas
+                  arba el. paštas, ar IBAN laukelis nėra tuščias.
+                Jei yra klaidų, rodomi pranešimai ir nukreipiama atgal į registracijos puslapį.
+                Jei nėra klaidų, sukuriamas naujas vartotojas ir jo profilis.
+                Rodomas pranešimas apie sėkmingą registraciją ir nukreipiama į prisijungimo puslapį.
+    """
     if request.method == 'GET':
         return render(request, 'registration/registration.html')
 
@@ -162,7 +246,20 @@ def register_user(request):
 @login_required
 @csrf_protect
 def get_user_profile(request):
-    """Rodo ir leidžia redaguoti prisijungusiam vartotojui profilį."""
+    """
+        Rodo ir leidžia redaguoti prisijungusiam vartotojui profilį.
+
+        Funkcijos logika:
+            1. Jei užklausa yra POST:
+                * Gaunamos formos duomenys.
+                * Tikrinama, ar formos yra validžios.
+                * Jei formos yra validžios, išsaugomi duomenys ir rodomas pranešimas apie sėkmingą atnaujinimą.
+                * Jei formos nėra validžios, rodomas pranešimas apie klaidą.
+                * Nukreipiama į profilio puslapį.
+            2. Jei užklausa yra GET:
+                * Sukuriamos formos su esamais vartotojo duomenimis.
+                * Atvaizduojamas profilio šablonas su formomis.
+        """
     if request.method == 'POST':
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -186,8 +283,20 @@ def get_user_profile(request):
 
 
 class DressRentalByUserCreateView(LoginRequiredMixin, generic.CreateView):
-    """Leidžia prisijungusiam vartotojui išsinuomoti suknelę,
-    sukuriant naują įrašą DressRental modelyje."""
+    """
+        Leidžia prisijungusiam vartotojui išsinuomoti suknelę,
+        sukuriant naują įrašą DressRental modelyje.
+
+        Klasės kintamieji:
+            model (Model): Modelis, kuriame bus sukurtas naujas objektas (DressRental).
+            form_class (Form): Suknelės nuomos forma (UserDressRentalCreateForm).
+            template_name (str): Šablono pavadinimas ('user_dress_form_create.html').
+            success_url (str): URL, į kurį nukreipiama po sėkmingo sukūrimo.
+
+        Metodai:
+            get_form_kwargs(): Gauna suknelės ID ir perduoda jį formai.
+            form_valid(): Nustato prisijungusį vartotoją ir nuomos statusą.
+    """
     model = DressRental
     form_class = UserDressRentalCreateForm
     template_name = 'user_dress_form_create.html'
@@ -212,7 +321,19 @@ class DressRentalByUserCreateView(LoginRequiredMixin, generic.CreateView):
 
 
 class DressRentalByUserUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
-    """Leidžia prisijungusiam vartotojui redaguoti savo suknelių nuomos įrašus."""
+    """
+        Leidžia prisijungusiam vartotojui redaguoti savo suknelių nuomos įrašus.
+
+        Klasės kintamieji:
+            model (Model): Modelis, kuriame bus atnaujintas objektas (DressRental).
+            form_class (Form): Suknelės nuomos forma (UserDressRentalCreateForm).
+            template_name (str): Šablono pavadinimas ('user_dress_form_update.html').
+            success_url (str): URL, į kurį nukreipiama po sėkmingo atnaujinimo.
+
+        Metodai:
+            form_valid(): Nustato prisijungusį vartotoją ir nuomos statusą.
+            test_func(): Tikrina, ar vartotojas yra nuomos įrašo savininkas.
+    """
     model = DressRental
     form_class = UserDressRentalCreateForm
     template_name = 'user_dress_form_update.html'
@@ -232,7 +353,18 @@ class DressRentalByUserUpdateView(LoginRequiredMixin, UserPassesTestMixin, gener
 
 
 class DressReviewDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
-    """Leidžia admin ištrinti atsiliepimus apie sukneles."""
+    """
+        Leidžia admin ištrinti atsiliepimus apie sukneles.
+
+        Klasės kintamieji:
+            model (Model): Modelis, kuriame bus ištrintas objektas (DressReview).
+            template_name (str): Šablono pavadinimas ('staff_dressreview_delete.html').
+            context_object_name (str): Konteksto kintamojo pavadinimas ('dressreview').
+
+        Metodai:
+            get_success_url(): Nukreipia į suknelės puslapį po atsiliepimo ištrynimo.
+            test_func(): Tikrina, ar vartotojas priklauso 'staff' grupei.
+    """
     model = DressReview
     template_name = 'staff_dressreview_delete.html'
     context_object_name = 'dressreview'
@@ -250,3 +382,95 @@ class DressReviewDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.Del
             if group.name == 'staff':
                 check = True
         return check
+
+
+class AllRentsView(LoginRequiredMixin, UserPassesTestMixin, generic.TemplateView):
+    """
+        Rodo visų suknelių nuomos įrašų sąrašą, pasiekiama tik prisijungusiems vartotojams,
+        kurie priklauso "moderators" grupei.
+
+        Klasės kintamieji:
+            template_name (str): Šablono pavadinimas ('all_rents.html').
+
+        Metodai:
+            get_context_data(): Prideda 'dress_rentals' kintamąjį į kontekstą.
+            test_func(): Tikrina, ar vartotojas priklauso 'moderators' grupei.
+    """
+    template_name = 'all_rents.html'
+
+    def get_context_data(self, **kwargs):
+        """Prideda dress_rentals kintamąjį, kuriame yra visi DressRental objektai"""
+        context = super().get_context_data(**kwargs)
+        context['dress_rentals'] = DressRental.objects.all()
+        return context
+
+    def test_func(self):
+        """Tikrina ar prisijungęs vartotojas priklauso 'moderators' grupei"""
+        check = False
+        for group in self.request.user.groups.all():
+            if group.name == 'moderators':
+                check = True
+        return check
+
+
+class DressRentalDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
+    """
+        Leidžia moderatoriams ištrinti nuomos įrašus.
+
+        Klasės kintamieji:
+            model (Model): Modelis, kuriame bus ištrintas objektas (DressRental).
+            template_name (str): Šablono pavadinimas ('moderator_dressrental_delete.html').
+            context_object_name (str): Konteksto kintamojo pavadinimas ('dressrental').
+
+        Metodai:
+            test_func(): Tikrina, ar vartotojas priklauso 'moderators' grupei.
+            get_success_url(): Nukreipia atgal į nuomų įrašų puslapį po įrašo ištrynimo.
+    """
+    model = DressRental
+    template_name = 'moderator_dressrental_delete.html'
+    context_object_name = 'dressrental'
+
+    def test_func(self):
+        """Tikrina ar prisijungęs vartotojas priklauso 'moderators' grupei"""
+        check = False
+        for group in self.request.user.groups.all():
+            if group.name == 'moderators':
+                check = True
+        return check
+
+    def get_success_url(self):
+        """Nukreipia atgal į nuomų įrašų puslapį po įrašo ištrynimo"""
+        return reverse('allrents')
+
+
+class DressRentalUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
+    """
+        Leidžia moderatoriams redaguoti nuomos įrašų statusus.
+
+        Klasės kintamieji:
+            model (Model): Modelis, kuriame bus atnaujintas objektas (DressRental).
+            fields (list): Laukų, kuriuos galima redaguoti, sąrašas (['status']).
+            template_name (str): Šablono pavadinimas ('moderator_dressrental_update.html').
+            context_object_name (str): Konteksto kintamojo pavadinimas ('dressrental').
+
+        Metodai:
+            test_func(): Tikrina, ar vartotojas priklauso 'moderators' grupei.
+            form_valid(): Nukreipia atgal į nuomų įrašų puslapį po įrašo atnaujinimo.
+    """
+    model = DressRental
+    fields = ['status']
+    template_name = 'moderator_dressrental_update.html'
+    context_object_name = 'dressrental'
+
+    def test_func(self):
+        """Tikrina ar prisijungęs vartotojas priklauso 'moderators' grupei"""
+        check = False
+        for group in self.request.user.groups.all():
+            if group.name == 'moderators':
+                check = True
+        return check
+
+    def form_valid(self, form):
+        """Nukreipia atgal į nuomų įrašų puslapį po įrašo atnaujinimo"""
+        form.save()
+        return redirect('allrents')

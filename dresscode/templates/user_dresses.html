@@ -8,7 +8,7 @@
 <ul>
     {% for dressrental in dressrental_list %}
         <li>
-            {{ dressrental.id }}
+            {{ dressrental.id }} {{ dressrental.dress.designer }}
             <div style="display: flex; align-items: center;">
                 <img src="{{ dressrental.dress.dresses_pics.url }}" style="max-width: 100px;
                 max-height: 100px; margin-right: 10px;">

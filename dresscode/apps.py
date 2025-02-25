@@ -6,4 +6,8 @@ class DresscodeConfig(AppConfig):
     name = 'dresscode'
 
     def ready(self):
+        """ Vykdomas programėlės paleidimo metu.
+            Importuoja signalus, kad jie būtų prijungti ir veiktų.
+            Šiuo atveju importuojamas 'create_profile' signalas.
+        """
         from .signals import create_profile

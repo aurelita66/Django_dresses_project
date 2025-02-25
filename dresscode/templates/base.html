@@ -54,8 +54,31 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
-          {% if user.is_authenticated %}
-            <li class="nav-item">
+
+            {% load moderator_tags %}
+
+            {% if user.is_authenticated %}
+            {% if user|is_moderator %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'user-profile' %}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+                      class="bi bi-person-heart" viewBox="0 0 16 16">
+                    <path d="M9 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h10s1 0 1-1-1-4-6-4-6 3-6
+                          4m13.5-8.09c1.387-1.425 4.855 1.07 0 4.277-4.854-3.207-1.387-5.702 0-4.276Z"/>
+                  </svg>
+                 {{ user.username }}</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'index' %}">Main</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'allrents' %}">All dresses rentals</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Sign out</a>
+              </li>
+            {% else %}
+              <li class="nav-item">
               <a class="nav-link" href="{% url 'user-profile' %}">
                  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
                       class="bi bi-person-heart" viewBox="0 0 16 16">
@@ -63,14 +86,14 @@
                           4m13.5-8.09c1.387-1.425 4.855 1.07 0 4.277-4.854-3.207-1.387-5.702 0-4.276Z"/>
                  </svg>
                  {{ user.username }}</a>
-            </li>
+              </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url 'my-dresses' %}">My dresses</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url 'logout' %}">Sign out</a>
             </li>
-                        <li class="nav-item">
+            <li class="nav-item">
               <a class="nav-link" href="{% url 'index' %}">Main</a>
             </li>
             <li class="nav-item">
@@ -98,7 +121,7 @@
             </button>
           </form>
           {% endif %}
-
+          {% endif %}
         </div>
       </div>
     </nav>
